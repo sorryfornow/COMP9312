@@ -1,0 +1,3 @@
+/Users/siqingzhang/Desktop/COMP9312_asmt1/cmake-build-debug/CMakeFiles/COMP9312_asmt1.dir
+/Users/siqingzhang/Desktop/COMP9312_asmt1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/siqingzhang/Desktop/COMP9312_asmt1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
