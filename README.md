@@ -1,5 +1,7 @@
 # COMP9312
-code for asmt1
+code for asmt1 is in main.cpp namespace ASMT1
+
+Siqing Zhang
 
 According to the lecture, performing an id-to-name mapping before graph processing is necessary since the time comlexity can be reduced by doing so given the overhead and the real performance of hashmap is unsatisfactory somewhat. Furthermore, after mapping any type of vertex id into integer, the vertex is now naturally std::size_t type, which can be directly used as the subscript of array.
 
