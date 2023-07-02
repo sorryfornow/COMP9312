@@ -98,6 +98,64 @@ namespace ASMT1 {
             }
         }
 
+        /** The function below is used to calculate the distance between two vertices sets.
+         * The distance is defined as the number of edges in the shortest path between two vertices sets.
+         * The function is implemented by rebuild the adjacency list and using BFS to probe the distance.
+         * **/
+        std::size_t setDistance(std::unordered_set<Vertex> x, std::unordered_set<Vertex> y) {
+
+            // intersection
+            std::unordered_set<Vertex> intersection = std::set_intersection(x.begin(), x.end(), y.begin(), y.end());
+            if (!intersection.empty()) {
+                return 0;
+            }
+
+            // rebuild graph
+            std::unordered_map<Vertex, std::unordered_set<Vertex>> neighbors_new{};
+
+            for (auto [u,nbrs]: neighbors) {
+                if (x.count(u)) u = 'x';
+                if (y.count(u)) u = 'y';
+                for (auto v: nbrs) {
+                    if (x.count(v)) v = 'x';
+                    if (y.count(v)) v = 'y';
+                    if (u == v) continue;
+                    neighbors_new[u].insert(v);
+                    neighbors_new[v].insert(u);
+                }
+            }
+
+            // BFS
+            Vertex start = 'x';
+            std::size_t distance = 0;
+            std::queue<Vertex> q;
+            std::unordered_set<Vertex> visited;
+
+            q.push(start);
+            visited.insert(start);
+
+            std::size_t level = 0;
+
+            while (!q.empty()) {
+                ++level;
+                std::size_t Q_size = q.size();
+                for (std::size_t i = 0; i < Q_size; ++i) {
+                    auto u = q.front();
+                    q.pop();
+                    for (const auto &v: neighbors_new[u]) {
+                        if (visited.count(v)) continue;
+                        q.push(v);
+                        visited.insert(v);
+                        if (v == 'y') return level;
+                    }
+                }
+
+            }
+
+            // cannot reach
+            return std::numeric_limits<std::size_t>::max();
+        }
+
         std::unordered_map<Vertex, std::set<Vertex>> get_neighbors() {
             return neighbors;
         }
@@ -293,10 +351,14 @@ int main() {
     std::vector<std::tuple<char,char,std::size_t>> Fig3 = { {'A', 'B', 1u}, {'D', 'C', 2u}, {'A', 'C', 3u}, {'B', 'C', 4u},};
 
     using namespace ASMT1;
-    undirectedUnweightedGraph<char> g1(Fig1); // Q1
-    disjoint_set<char> ds1(Fig1);   // Q2
+    // Q1
+    undirectedUnweightedGraph<char> g1(Fig1);
 
-    directedUnweightedGraph<char> g2(Fig2); // Q3
+    // Q2
+    disjoint_set<char> ds1(Fig1);
+
+    // Q3
+    directedUnweightedGraph<char> g2(Fig2);
     auto res = g2.topological_sort();
     std::cout<< "Topological sort: ";
     for (auto& u: res) {
@@ -304,7 +366,11 @@ int main() {
     }
     std::cout<<std::endl;
 
-    undirectedTemporalGraph<char, std::size_t> g3(Fig3, 3u); // Q5
+    // Q4 line 105
+    /** std::size_t directedUnweightedGraph.setDistance(std::unordered_set<Vertex> x, std::unordered_set<Vertex> y) **/
+
+    // Q5
+    undirectedTemporalGraph<char, std::size_t> g3(Fig3, 3u);
 
 
 
