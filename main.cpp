@@ -200,7 +200,6 @@ namespace ASMT1 {
 
     };
 
-
     template<typename Vertex>
     class directedUnweightedGraph {
         using Edge = std::pair<Vertex, Vertex>;
@@ -320,7 +319,117 @@ namespace ASMT1 {
     };
 }
 
-int main() {
+namespace ASMT2 {
+
+    template<typename Vertex>
+    class disjoint_set {
+    private:
+        std::unordered_map<Vertex, Vertex> parent{};
+        std::unordered_map<Vertex, std::size_t> rank{}; //  union by rank
+    public:
+        explicit disjoint_set(std::vector<Vertex> vertices) {
+            for (const auto &v: vertices) {
+                parent[v] = v;
+                rank[v] = 0u;
+            }
+        }
+
+        explicit disjoint_set() = default;
+
+        void make_set(Vertex v) {
+            if (parent.count(v)) return;
+            parent[v] = v;
+            rank[v] = 0u;
+        }
+
+        Vertex find(Vertex u) {
+            if (parent[u] != u) parent[u] = find(parent[u]);
+            return parent[u];
+        }
+
+        void merge(Vertex u, Vertex v) {
+            auto u_root = find(u);
+            auto v_root = find(v);
+            if (u_root == v_root) return;
+            if (rank[u_root] < rank[v_root]) {
+                parent[u_root] = v_root;
+            } else if (rank[u_root] > rank[v_root]) {
+                parent[v_root] = u_root;
+            } else {
+                parent[v_root] = u_root;
+                rank[u_root]++;
+            }
+        }
+
+        std::unordered_map<Vertex, std::vector<Vertex>> get_components() {
+            std::unordered_map<Vertex, std::vector<Vertex>> components{};
+            for (const auto &[u, _]: parent) {
+                components[find(u)].emplace_back(u);
+            }
+            return components;
+        }
+
+        std::unordered_map<Vertex, Vertex> get_parent() {
+            return parent;
+        }
+
+    };
+
+    template<typename Vertex>
+    class undirectedUnweightedGraph {
+        using edge_t = std::pair<Vertex, Vertex>;   // edge (u, v) type
+        using truss_tri_t = std::tuple<Vertex, Vertex, std::size_t>;    // edge with its truss number (u, v, k) type
+        using adjacency_t = std::unordered_map<Vertex, std::vector<Vertex>>;    // adjacency list type
+    private:
+        adjacency_t neighbors{};
+    public:
+        explicit undirectedUnweightedGraph(std::vector<edge_t> edges) {
+            std::unordered_map<Vertex, std::set<Vertex>> neighbors_{};
+            for (const auto &[u, v]: edges) {
+                neighbors_[u].insert(v);
+                neighbors_[v].insert(u);
+            }
+            for (const auto &[u, adj]: neighbors_) {
+                neighbors[u] = std::vector<Vertex>(adj.begin(), adj.end());
+            }
+        }
+
+        std::unordered_map<Vertex, std::vector<Vertex>> get_neighbors() {
+            return neighbors;
+        }
+
+        std::vector<std::vector<Vertex>> get_truss_set([[maybe_unused]] adjacency_t G, std::vector<truss_tri_t> KTruss_arr, int k ){
+            // initializing an empty disjoint set
+            disjoint_set<Vertex> DS;
+            for (const auto &[u, v, n]: KTruss_arr) {
+                if (n<k) break;
+                DS.make_set(u);
+                DS.make_set(v);
+                DS.merge(u, v);
+            }
+
+            // get the disjoint set
+            std::unordered_map<Vertex, Vertex> parent = DS.get_parent();
+
+            // yield the components
+            std::unordered_map<Vertex, std::vector<Vertex>> components{};
+            for (const auto &[u, _]: parent) components[DS.find(u)].emplace_back(u);
+
+            // return the truss set
+            std::vector<std::vector<Vertex>> truss_set{};
+            for (const auto &[u, comp]: components) truss_set.emplace_back(comp);
+
+            // sort the vertices in each component if needed
+            // for (auto &comp: truss_set) std::sort(comp.begin(), comp.end());
+
+            return truss_set;
+        }
+
+    };
+
+}
+
+void asmt1(){
     // undirected graph
     std::vector<std::pair<char, char>> Fig1 = { {'M','P'},{'P','N'},{'M','N'},
 
@@ -372,6 +481,51 @@ int main() {
     // Q5
     undirectedTemporalGraph<char, std::size_t> g3(Fig3, 3u);
 
+}
+
+void asmt2(){
+
+    // Q2
+
+    std::vector<std::pair<std::size_t, std::size_t>> Fig4{
+            {1u, 2u}, {1u, 3u}, {1u, 4u}, {1u, 5u},
+            {2u, 3u}, {2u, 4u}, {2u, 5u},
+            {3u, 4u}, {4u, 5u},
+
+            {4u, 11u}, {5u, 11u}, {6u, 7u}, {6u, 8u},
+            {6u, 10u}, {6u, 12u}, {7u, 12u},
+            {8u, 9u}, {8u, 10u}, {9u, 10u},
+
+            {2u, 6u}, {3u, 12u}, {7u, 13u},
+    };
+
+    std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> truss_tri{
+            {1u, 2u, 4u}, {1u, 3u, 4u}, {1u, 4u, 4u}, {1u, 5u, 4u},
+            {2u, 3u, 4u}, {2u, 4u, 4u}, {2u, 5u, 4u},
+            {3u, 4u, 4u}, {4u, 5u, 4u},
+
+            {4u, 11u, 3u}, {5u, 11u, 3u}, {6u, 7u, 3u}, {6u, 8u, 3u},
+            {6u, 10u, 3u}, {6u, 12u, 3u}, {7u, 12u, 3u},
+            {8u, 9u, 3u}, {8u, 10u, 3u}, {9u, 10u, 3u},
+
+            {2u, 6u, 2u}, {3u, 12u, 2u}, {7u, 13u, 2u},
+    };
+
+    using namespace ASMT2;
+    undirectedUnweightedGraph<std::size_t> g1(Fig4);
+    auto res = g1.get_truss_set(g1.get_neighbors(), truss_tri, 3);
+
+    for (auto& comp: res) {
+        std::cout<< "[";
+        for (auto& u: comp) {
+            std::cout<< u << ", ";
+        }
+        std::cout<<"]"<<std::endl;
+    }
+
+}
+
+int main() {
 
 
     return 0;
