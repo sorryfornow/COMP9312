@@ -9,3 +9,12 @@ Instead of doing bijection by 2 std::unordered_map between vertex id and vertex 
 Likewise, in disjoint set and other else class, the size array and parents array (std::vector or std::array type) are replaced by std::unordered_map. Since there will only be one more std::unordered_map used, the amortized time complexity can only have a negligible effect.
 
 The purpose of doing so is just to simplify the tediousness of coding and the explanation above illustrated that the expected time complexity is unaltered.
+
+The code in namespace ASMT2 is a partial realization of question 2 and 4 for assignment 2.
+For question 2, the algorithm is shown within the function below:
+std::vector<std::vector<Vertex>> get_truss_set(adjacency_t G, std::vector<truss_tri_t> KTruss_arr, int k_ ), 
+while the disjoint set used in the function is implemented in a seperated class under the same namespace.
+
+Graphlet (induced)
+4 2 3 0 0 for E
+2 4 6 0 1 for A
