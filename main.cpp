@@ -415,13 +415,13 @@ namespace ASMT2 {
             }
         }
 
-        std::unordered_map<Vertex, std::vector<Vertex>> get_components() {
-            std::unordered_map<Vertex, std::vector<Vertex>> components{};
-            for (const auto &[u, _]: parent) {
-                components[find(u)].emplace_back(u);
-            }
-            return components;
-        }
+//        std::unordered_map<Vertex, std::vector<Vertex>> get_components() {
+//            std::unordered_map<Vertex, std::vector<Vertex>> components{};
+//            for (const auto &[u, _]: parent) {
+//                components[find(u)].emplace_back(u);
+//            }
+//            return components;
+//        }
 
         std::unordered_map<Vertex, Vertex> get_parent() {
             return parent;
@@ -719,6 +719,7 @@ void asmt2(){
         }
         std::cout<<"]"<<std::endl;
     }
+    //  add EDAH
 
     // A's graphlet type 1 paths
     auto a_paths = allpath.at('A');
