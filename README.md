@@ -16,5 +16,4 @@ std::vector<std::vector<Vertex>> get_truss_set(adjacency_t G, std::vector<truss_
 while the disjoint set used in the function is implemented in a seperated class under the same namespace.
 
 Graphlet (induced)
-4 2 3 0 0 for E
-2 4 6 0 1 for A
+4 3 3 0 0 for E and 2 4 6 0 1 for A
